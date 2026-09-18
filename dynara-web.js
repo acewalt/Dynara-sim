@@ -469,6 +469,33 @@
         `Dynara creó ${id} · tema=${theme} · intensidad=${intensity.toFixed(2)}`, {
           sourceId: "dynara", targetId: id, importance: 0.9
         });
+
+      spec.npcs.forEach((npc, index) => {
+        const npcId = `${id}_npc_${String(index).padStart(2, "0")}`;
+        const player = [...this.world.entities.values()].find(x => x.kind === "Player" && x.active);
+        this.addEntity({
+          id: npcId,
+          name: npc.name,
+          kind: "Npc",
+          locationId: player?.locationId || "lobby",
+          active: true,
+          properties: {
+            adventure: id,
+            role: npc.role,
+            purpose: npc.purpose,
+            cognitiveRuntime: "NpcInt.Core"
+          },
+          tags: [...npc.traits, "cognitive_agent"]
+        }, true);
+        this.record("cognitive_npc_spawned",
+          `${npc.name} apareció como NPC cognitivo de ${id}.`, {
+            sourceId: "dynara",
+            targetId: npcId,
+            locationId: player?.locationId || "lobby",
+            importance: 0.65
+          });
+      });
+
       return this.result(true, "adventure_created", event.description, event, id);
     }
 
