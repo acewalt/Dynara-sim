@@ -1,0 +1,29 @@
+name: Validate Dynara
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Validate browser runtime syntax
+        run: node --check dynara-web.js
+
+      - name: Build cognitive runtime
+        run: dotnet build src/NpcInt.Core/NpcInt.Core.csproj --configuration Release
+
+      - name: Build Dynara simulation core
+        run: dotnet build src/DynaraSim.Core/DynaraSim.Core.csproj --configuration Release
