@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#090b10">
+  <title>Dynara Sim · Simulation Director Console</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">DYNARA-SIM / DIRECTOR RUNTIME</p>
+        <h1>Simulation Director Console</h1>
+      </div>
+      <div class="status-strip" aria-label="Estado de simulación">
+        <span><b id="status-time">0.0</b> min</span>
+        <span><b id="status-players">0</b> players</span>
+        <span><b id="status-adventure">none</b> adventure</span>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <section class="terminal-card">
+        <div class="terminal-head">
+          <div>
+            <span class="dot"></span>
+            <strong>dynara://simulation</strong>
+          </div>
+          <button id="clear-btn" type="button">limpiar</button>
+        </div>
+        <div id="terminal" class="terminal" role="log" aria-live="polite"></div>
+        <form id="terminal-form" class="command-row" autocomplete="off">
+          <span class="prompt">&gt;</span>
+          <input id="command" spellcheck="false" autocomplete="off" placeholder="Escribe /help o habla con Dynara">
+          <button type="submit">Enviar</button>
+        </form>
+      </section>
+
+      <aside class="inspector">
+        <section class="panel">
+          <div class="panel-title">Director</div>
+          <dl>
+            <div><dt>Identidad</dt><dd>DYNARA</dd></div>
+            <div><dt>Rol</dt><dd>Simulation Director</dd></div>
+            <div><dt>Objetivo</dt><dd id="director-goal">esperar usuarios</dd></div>
+            <div><dt>Performance</dt><dd id="director-performance">50%</dd></div>
+          </dl>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">WorldState</div>
+          <pre id="world-preview"></pre>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">Player model</div>
+          <pre id="player-preview">sin jugador activo</pre>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="./dynara-web.js"></script>
+</body>
+</html>
