@@ -20,6 +20,7 @@ namespace DynaraSim.Core
         public PerceptionSystem Perception { get; private set; }
         public AdventureDirector AdventureDirector { get; private set; }
         public ActionGateway Actions { get; private set; }
+        public AgentManager Agents { get; private set; }
         public DynaraDirector Dynara { get; private set; }
 
         public SimulationKernel(int seed = 1337)
@@ -29,6 +30,7 @@ namespace DynaraSim.Core
             Perception = new PerceptionSystem();
             AdventureDirector = new AdventureDirector();
             Actions = new ActionGateway(World, Events, AdventureDirector);
+            Agents = new AgentManager(World, Events, Perception, Actions);
             Dynara = new DynaraDirector(seed);
 
             World.Rules["decision_is_not_execution"] = "true";
@@ -153,6 +155,9 @@ namespace DynaraSim.Core
                 ActionResult result = Actions.Execute(plan.Steps[i]);
                 cycle.Results.Add(result);
                 Dynara.ObserveResult(result, World);
+
+                if (result.Success && string.Equals(result.Code, "adventure_created", StringComparison.OrdinalIgnoreCase))
+                    MaterializeAdventure(result.CreatedId);
             }
 
             return cycle;
@@ -203,6 +208,23 @@ namespace DynaraSim.Core
                     Active = true
                 };
                 World.Entities[key.Id] = key;
+            }
+        }
+
+        private void MaterializeAdventure(string adventureId)
+        {
+            AdventureState state;
+            if (string.IsNullOrWhiteSpace(adventureId) || !World.Adventures.TryGetValue(adventureId, out state) || state.Spec == null)
+                return;
+
+            string locationId = World.Players.Select(x => x.LocationId).FirstOrDefault(x => !string.IsNullOrWhiteSpace(x));
+            if (string.IsNullOrWhiteSpace(locationId)) locationId = "lobby";
+
+            for (int i = 0; i < state.Spec.Npcs.Count; i++)
+            {
+                string expectedId = state.Spec.Id + "_npc_" + i.ToString("00");
+                if (World.FindEntity(expectedId) != null) continue;
+                Agents.CreateNpc(state.Spec.Npcs[i], state.Spec.Id, i, locationId);
             }
         }
 
